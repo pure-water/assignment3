@@ -35,7 +35,10 @@ def rnn_step_forward(x, prev_h, Wx, Wh, b):
     # and cache variables respectively.                                          #
     ##############################################################################
     #numpy will do a magic extension
+
     next_h = np.tanh(np.matmul(prev_h, Wh) + np.matmul(x,Wx)+b)
+    cache  = (x,prev_h,Wx,Wh,b,next_h) 
+
     ##############################################################################
     #                               END OF YOUR CODE                             #
     ##############################################################################
@@ -58,13 +61,26 @@ def rnn_step_backward(dnext_h, cache):
     - db: Gradients of bias vector, of shape (H,)
     """
     dx, dprev_h, dWx, dWh, db = None, None, None, None, None
+
+    x,prev_h,Wx,Wh,b,next_h = cache
+
     ##############################################################################
     # TODO: Implement the backward pass for a single step of a vanilla RNN.      #
     #                                                                            #
     # HINT: For the tanh function, you can compute the local derivative in terms #
     # of the output value from tanh.                                             #
     ##############################################################################
-    pass
+
+    dtanh   = np.multiply(dnext_h,(1  - next_h**2))   #(N,H)
+    db      = np.sum(dtanh)
+     
+    dx      = np.dot(dtanh,Wx.T)
+    dWx     = np.dot(x.T,dtanh)
+
+    dprev_h = np.dot(dtanh,Wh.T)
+    dWh     = np.dot(prev_h.T,dtanh)
+
+
     ##############################################################################
     #                               END OF YOUR CODE                             #
     ##############################################################################
